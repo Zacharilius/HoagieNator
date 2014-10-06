@@ -14,12 +14,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MainClass extends Applet implements Runnable, KeyListener {
-	enum GameState {
-		Running, Dead
-	}
-
-	GameState state = GameState.Running;
-	
 	private Image image,projectile_fork, background;
 	private Graphics second;
 	private URL base;
@@ -66,15 +60,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	@Override
 	public void start() {
 		bg1 = new Background(0, 0);
-		bg2 = new Background(1280, 0);	
-		try {
-			loadMap("data/map1.txt");
-			System.out.println("Here");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		bg2 = new Background(2160, 0);
 		// TODO Auto-generated method stub
 		super.start();
 		// Game Loop is on this Thread
@@ -113,9 +99,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 					projectiles.remove(i);
 				}
 			}
-			updateTiles();
-			bg1.update();
-			bg2.update();
+
 			repaint();
 			// Sleep for 17 milliseconds = 60 updates per second
 			try {
@@ -148,28 +132,15 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	 * Draws the graphics to the screen.
 	 */
 	public void paint(Graphics g) {
-		if (state == GameState.Running) {
-
-			g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
-			g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
-			paintTiles(g);
-			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
-			// ArrayList projectiles = SHOOTER.getProjectiles();
-			ArrayList projectiles = getProjectiles();
-			for (int i = 0; i < projectiles.size(); i++) {
-				Projectile p = (Projectile) projectiles.get(i);
-				g.setColor(Color.YELLOW);
-				g.fillRect(p.getX(), p.getY(), 10, 5);
-			}
+		// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
+		// ArrayList projectiles = SHOOTER.getProjectiles();
+		ArrayList projectiles = getProjectiles();
+		for (int i = 0; i < projectiles.size(); i++) {
+			Projectile p = (Projectile) projectiles.get(i);
+			g.setColor(Color.YELLOW);
+			g.fillRect(p.getX(), p.getY(), 10, 5);
 		}
-		else if (state == GameState.Dead) {
-			g.setColor(Color.BLACK);
-			g.fillRect(0, 0, 800, 480);
-			g.setColor(Color.WHITE);
-			g.drawString("Dead", 360, 240);
 
-
-		}
 	}
 	
 	/**
@@ -291,27 +262,5 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			}
 		}
 
-	}
-	private void updateTiles() {
-
-		for (int i = 0; i < tilearray.size(); i++) {
-			Tile t = (Tile) tilearray.get(i);
-			t.update();
-		}
-
-	}
-
-	private void paintTiles(Graphics g) {
-		for (int i = 0; i < tilearray.size(); i++) {
-			Tile t = (Tile) tilearray.get(i);
-			g.drawImage(t.getTileImage(), t.getTileX(), t.getTileY(), this);
-		}
-	}
-	public static Background getBg1() {
-		return bg1;
-	}
-
-	public static Background getBg2() {
-		return bg2;
 	}
 }

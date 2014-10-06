@@ -8,7 +8,7 @@ public class Tile {
 	private int tileX, tileY, speedX, type;
 	public Image tileImage;
 
-	//private Robot robot = MainClass.getRobot();
+	private Robot robot = MainClass.getRobot();
 	private Background bg = MainClass.getBg1();
 
 	private Rectangle r;
@@ -43,13 +43,12 @@ public class Tile {
 			speedX = bg.getSpeedX() * 5;
 			tileX += speedX;
 			r.setBounds(tileX, tileY, 40, 40);
-	/*
+	
 			if (r.intersects(Robot.yellowRed) && type != 0) {
 				checkVerticalCollision(Robot.rect, Robot.rect2);
 				checkSideCollision(Robot.rect3, Robot.rect4, Robot.footleft, Robot.footright);
 			}
-			*/
-
+	
 		}
 
 	public int getTileX() {
@@ -80,17 +79,15 @@ public class Tile {
 		if (rtop.intersects(r)) {
 			
 		}
-/*
+
 		if (rbot.intersects(r) && type == 8) {
 			robot.setJumped(false);
 			robot.setSpeedY(0);
 			robot.setCenterY(tileY - 63);
 		}
-*/
 	}
 
 	public void checkSideCollision(Rectangle rleft, Rectangle rright, Rectangle leftfoot, Rectangle rightfoot) {
-/*
 		if (type != 5 && type != 2 && type != 0){
 			if (rleft.intersects(r)) {
 				robot.setCenterX(tileX + 102);
@@ -113,8 +110,13 @@ public class Tile {
 				robot.setSpeedX(0);
 			}
 		}
-*/
 	}
-	
+	public static Background getBg1() {
+		return bg1;
+	}
+
+	public static Background getBg2() {
+		return bg2;
+	}
 
 }
