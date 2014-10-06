@@ -7,7 +7,7 @@ package hoagienator;
 public class Enemy {
 
   private int maxHealth, currentHealth, power, speedX, centerX, centerY;
-  private Background bg = StartingClass.getBg1();
+  private Background bg = MainClass.getBg1();
   
   public void update(){
     centerX += speedX;
