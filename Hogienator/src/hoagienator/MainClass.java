@@ -89,7 +89,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		}
 
 		// Image Setups
-		projectile_fork = getImage(base, "data/bullet_fork.png");
+		projectile_fork = getImage(base, "data/bullet_fork2.png");
 
 		background = getImage(base, "data/background.png");
 
@@ -172,7 +172,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			// Removes offscreen projectiles from memory.
 			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
 			// ArrayList<Projectile> projectiles = SHOOTER.getProjectiles();
-			ArrayList<Projectile> projectiles = getProjectiles();
+			ArrayList<Projectile> projectiles = heroClass.getProjectiles();
 			for (int i = 0; i < projectiles.size(); i++) {
 				Projectile p = (Projectile) projectiles.get(i);
 				if (p.isVisible() == true) {
@@ -345,7 +345,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			paintTiles(g);
 			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
 			// ArrayList projectiles = SHOOTER.getProjectiles();
-			ArrayList projectiles = getProjectiles();
+			ArrayList projectiles = heroClass.getProjectiles();
 			for (int i = 0; i < projectiles.size(); i++) {
 				Projectile p = (Projectile) projectiles.get(i);
 				// g.setColor(Color.YELLOW);
@@ -478,7 +478,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 		case KeyEvent.VK_CONTROL:
 			System.out.println("Shoot");
-			shoot();
+			heroClass.shoot();
 			break;
 
 		case KeyEvent.VK_SHIFT:
@@ -557,26 +557,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// TODO Auto-generated method stub
 	}
 
-	// PLACE THESE INSIDE MAIN CHARACTER CLASS
-	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
-
-	/**
-	 * Adds projectiles to the given location.
-	 */
-	public void shoot() {
-		Projectile p = new Projectile(150, 357);
-		projectiles.add(p);
-	}
-
-	/**
-	 * 
-	 * @return ArrayList of Projectile objects.
-	 */
-	public ArrayList getProjectiles() {
-		return projectiles;
-	}
-
-	// //
+	
 	private void loadMap(String filename) throws IOException {
 		ArrayList lines = new ArrayList();
 		int width = 0;
