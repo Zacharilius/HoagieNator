@@ -69,12 +69,16 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	public static Image tilegrassTop, tilegrassBot, tilegrassLeft,
 			tilegrassRight, tiledirt;
 	private ArrayList<Tile> tilearray = new ArrayList<Tile>();
+	
+	private int rightBorderX = 800;
+	private int upperBorderY = 480;
+	private int maxNumberProjectilesOnScreen = 6;
 
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
 		super.init();
-		setSize(800, 480);
+		setSize(rightBorderX, upperBorderY);
 		setBackground(Color.BLACK);
 		setFocusable(true);
 		Frame frame = (Frame) this.getParent().getParent();
@@ -170,11 +174,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	public void run() {
 		while (true) {
 			// Removes offscreen projectiles from memory.
-			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
-			// ArrayList<Projectile> projectiles = SHOOTER.getProjectiles();
 			ArrayList<Projectile> projectiles = heroClass.getProjectiles();
 			for (int i = 0; i < projectiles.size(); i++) {
 				Projectile p = (Projectile) projectiles.get(i);
+				p.setScreenBorder(rightBorderX);
 				if (p.isVisible() == true) {
 					p.update();
 				} else {
@@ -477,8 +480,11 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			break;
 
 		case KeyEvent.VK_CONTROL:
-			System.out.println("Shoot");
-			heroClass.shoot();
+			//keypress works only if max number of projectiles aren't on screen already.
+			if(heroClass.getProjectiles().size() < maxNumberProjectilesOnScreen){
+				System.out.println("Shoot");
+				heroClass.shoot();
+			}
 			break;
 
 		case KeyEvent.VK_SHIFT:

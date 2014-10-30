@@ -4,6 +4,7 @@ public class Projectile {
 	private int x,y;
 	private int speedX; //Speed of projectile
 	private boolean visible;
+	private int screenBorder;
 	
 	/**
 	 * Default Constructor.
@@ -13,7 +14,8 @@ public class Projectile {
 	public Projectile(int startX,int startY) {
 		x = startX;
 		y = startY;
-		speedX = 7; 
+		speedX = 6;
+		screenBorder = 800;
 		visible = true;
 	}
 	
@@ -22,7 +24,7 @@ public class Projectile {
 	 */
 	public void update() {
 		x += speedX;
-		if(x > 800){
+		if(x > screenBorder){
 			visible = false;
 		}
 	}
@@ -57,5 +59,9 @@ public class Projectile {
 
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+	
+	public void setScreenBorder(int screenBorder) {
+		this.screenBorder = screenBorder;
 	}
 }
