@@ -165,7 +165,7 @@ public class Hero {
 	 * 
 	 * @return ArrayList of Projectile objects.
 	 */
-	public ArrayList getProjectiles() {
+	public ArrayList<Projectile> getProjectiles() {
 		return projectiles;
 	}
 }

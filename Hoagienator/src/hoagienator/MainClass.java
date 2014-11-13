@@ -174,14 +174,16 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	public void run() {
 		while (true) {
 			// Removes offscreen projectiles from memory.
-			ArrayList<Projectile> projectiles = heroClass.getProjectiles();
-			for (int i = 0; i < projectiles.size(); i++) {
-				Projectile p = (Projectile) projectiles.get(i);
+			ArrayList<Projectile> heroProjectiles = heroClass.getProjectiles();
+			//REPLACE 'enemy' WITH ACTUAL ENEMY VARIABLE NAME
+			//ArrayList<Projectile> enemyProjectiles = enemy.getProjectiles();
+			for (int i = 0; i < heroProjectiles.size(); i++) {
+				Projectile p = (Projectile) heroProjectiles.get(i);
 				p.setScreenBorder(rightBorderX);
 				if (p.isVisible() == true) {
 					p.update();
 				} else {
-					projectiles.remove(i);
+					heroProjectiles.remove(i);
 				}
 			}
 			try{
