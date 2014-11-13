@@ -51,6 +51,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	// Self-explanatory.
 	// protected KeyListener alpha;
 	protected Hero heroClass = new Hero();
+
 	protected ItemDrops ItemClass = new ItemDrops();
 	// protected Image image;
 	// protected Graphics second;

@@ -151,8 +151,6 @@ public class Hero {
 		pictureChange = x;
 	}
 
-	
-
 	/**
 	 * Adds projectiles to the given location.
 	 */

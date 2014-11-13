@@ -1,5 +1,6 @@
 package hoagienator;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
 /*
@@ -10,6 +11,7 @@ public class Enemy {
 
 	private int maxHealth, currentHealth, power, speedX, centerX, centerY;
 	private Background bg = MainClass.getBg1();
+	public Rectangle r = new Rectangle(0,0,0,0);
 
 	// Stores the bullets that the player shoots.
 	protected ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
@@ -17,7 +19,23 @@ public class Enemy {
 	public void update() {
 		centerX += speedX;
 		speedX = bg.getSpeedX();
+		r.setBounds(centerX-25, centerY-25, 50, 60);
+		
+		/*
+		if(r.intersects(Hero.yellowRed)){
+			checkCollision();
+		}
+		*/
 	}// end update method
+	
+	private void checkCollision() {
+		/*
+		if (r.intersects(Hero.rect) || r.intersects(Hero.rect2) || r.intersects(Hero.rect3) || r.intersects(Hero.rect4)){
+		System.out.println("collision");
+
+		}
+		*/
+	}
 
 	public void die() {
 
