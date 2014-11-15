@@ -142,7 +142,6 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		bg2 = new Background(1280, 0);
 		try {
 			loadMap("data/map1.txt");
-			System.out.println("Here");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -452,7 +451,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			//Added code to control background
 			if (heroClass.movingRight){
 				bg1.setBgX(bg1.getBgX() - 4);
-				bg2.setBgX(bg1.getBgX() - 4);
+				bg2.setBgX(bg2.getBgX() - 4);
 			}
 		}
 
