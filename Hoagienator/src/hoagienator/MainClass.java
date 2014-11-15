@@ -403,6 +403,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		if (keysPressed[1] == true && keysPressed[2] == true) {
 			// Update the hero's X coordinates.
 			heroClass.updateHeroX(heroClass.heroX + 8);
+			
 			// Check pictureChange. If it is 2, change the picture.
 			if (heroClass.pictureChange() >= 2) {
 				// Update the hero's picture.
@@ -447,6 +448,12 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// Ensure that the hero cannot pass the center of the screen.
 		if (heroClass.heroX() >= 400) {
 			heroClass.updateHeroX(400);
+			
+			//Added code to control background
+			if (heroClass.movingRight){
+				bg1.setBgX(bg1.getBgX() - 4);
+				bg2.setBgX(bg1.getBgX() - 4);
+			}
 		}
 
 	}
