@@ -365,6 +365,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 		}
 
+		// Draw hero bounding box
+		g.drawRect((int)heroClass.rect.getX(), (int)heroClass.rect.getY(), (int)heroClass.rect.getWidth(), (int)heroClass.rect.getHeight());
+		g.drawRect((int)heroClass.rect2.getX(), (int)heroClass.rect2.getY(), (int)heroClass.rect2.getWidth(), (int)heroClass.rect2.getHeight());
+		
 		// Draw hero in current location.
 		g.drawImage(hero[heroClass.heroPic()], heroClass.heroX(),
 				heroClass.heroY(), this);
@@ -437,6 +441,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				heroClass.updatePictureChange(heroClass.pictureChange() + 1);
 			}
 		}
+		
+		//Update Bounding Box position after movement
+		heroClass.updateBoundingBox(heroClass.heroX,heroClass.heroY);
+		
 		// Make sure that the array of hero images never passes 16 or goes below
 		// 0.
 		if (heroClass.heroPic() == 16) {
