@@ -27,7 +27,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	}
 
 	// test enemy
-	protected Heliboy testHeliboy;
+	protected static Heliboy testHeliboy;
 	
 	// Array to hold all hero images.
 	protected BufferedImage[] hero = new BufferedImage[16];

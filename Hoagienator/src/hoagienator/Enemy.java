@@ -7,16 +7,18 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.Timer;
 
 /*
  *
  */
 
 public class Enemy {
-
-	private int maxHealth, currentHealth, power, speedX, centerX, centerY;
+	protected int currentHealth = 5;
+	private int maxHealth, power, speedX, centerX, centerY;
 	private Background bg = MainClass.getBg1();
 	public Rectangle r = new Rectangle(0,0,0,0);
+	
 
 	// Stores the bullets that the player shoots.
 	protected ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
@@ -26,17 +28,25 @@ public class Enemy {
 		speedX = bg.getSpeedX();
 		r.setBounds(centerX-25, centerY-25, 50, 60);
 		
-		
 		if(r.intersects(Hero.rect)){
 			checkCollision();
 		}
 		
 	}// end update method
 	
+	/*
+	 * Decreases Hero's health on contact
+	 */
 	private void checkCollision() {
 			System.out.println("collision");
 			if (MainClass.heroClass.currentLife() > 0) {
 				MainClass.heroClass.updateCurrentLife(MainClass.heroClass.currentLife() - 1);
+				MainClass.heroClass.updateHeroX(MainClass.heroClass.heroX - 60);
+				/*
+				timer = new Timer(5000, new ActionListener() {});
+				timer.setRepeats(false);
+				timer.start();
+				*/
 
 			} else if (MainClass.heroClass.currentLife() == 0) {
 				System.out.println("Player is dead");
@@ -57,7 +67,8 @@ public class Enemy {
 	}
 
 	public void die() {
-
+		//just moves enemy up and out of the way.
+		setCenterY(50);
 	}// end die method
 
 	public void attack() {

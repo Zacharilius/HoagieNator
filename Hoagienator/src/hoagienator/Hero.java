@@ -3,6 +3,8 @@ package hoagienator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import java.util.Timer;
+
 public class Hero {
 	// Hero X and Y coordinates.
 	protected int heroX = 50;
@@ -10,6 +12,10 @@ public class Hero {
 	
 	// Bounding boxes
 	protected static Rectangle rect = new Rectangle(0, 0, 0, 0);
+	
+	// Limited Invincibility
+	protected boolean isInvincible = false;
+	protected Timer timer;
 
 	// Shows which way the hero is moving.
 	protected boolean movingLeft = false;
@@ -102,6 +108,10 @@ public class Hero {
 		return pictureChange;
 	}
 	
+	public boolean getInvincibility(){
+		return isInvincible;
+	}
+	
 	// Update methods.
 	public void updateHeroX(int x) {
 		heroX = x;
@@ -159,6 +169,23 @@ public class Hero {
 		rect.setRect(centerX + 5, centerY , 30, 105);
 	}
 
+	public void updateInvincibility ( int seconds )   {
+		timer = new Timer() ;
+	    //timer.schedule ( new ToDoTask (  ) , seconds*1000 ) ;
+	  }
+		
+	/*
+	  class ToDoTask extends TimerTask  {
+	    public void run (  )   {
+	      System.out.println ( "OK, It's time to do something!" ) ;
+	      timer.cancel (  ) ; //Terminate the thread
+	    }
+	  }
+	*/
+	public void updateInvisibility(boolean x){
+		isInvincible = x;
+	}
+	
 	/**
 	 * Adds projectiles to the given location.
 	 */

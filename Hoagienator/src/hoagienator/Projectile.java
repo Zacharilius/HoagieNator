@@ -59,33 +59,34 @@ public class Projectile {
 			if (x > screenBorder) {
 				visible = false;
 				r = null;
+			} else{
+				if (r.intersects(MainClass.testHeliboy.r)) {
+					checkCollision();
+				}
 			}
 		} else {
 			x -= speedX;
 			if (x < 0) {
 				visible = false;
 				r = null;
+			} else {
+				if (r.intersects(MainClass.testHeliboy.r)) {
+					checkCollision();
+				}
 			}
-		}
-		if (x < screenBorder + 1) {
-			checkCollision();
 		}
 	}
 
 	private void checkCollision() {
-		/*
-		//hb=name of enemy in Main Class.
-		if (r.intersects(MainClass.hb.r)) {
 			visible = false;
-			// StartingClass.score += 1;
-		}
-
-		if (r.intersects(MainClass.hb2.r)) {
-			visible = false;
-			// StartingClass.score += 1;
-
-		}
-		*/
+			r = null;
+			
+			if (MainClass.testHeliboy.getCurrentHealth() > 0) {
+				MainClass.testHeliboy.setCurrentHealth(MainClass.testHeliboy.getCurrentHealth()-1);
+			}
+			if (MainClass.testHeliboy.getCurrentHealth() <= 0) {
+				MainClass.testHeliboy.die();				
+			}
 	}
 
 	public int getX() {
