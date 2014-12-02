@@ -1,7 +1,12 @@
 package hoagienator;
 
 import java.awt.Rectangle;
+import java.io.File;
 import java.util.ArrayList;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 /*
  *
@@ -29,9 +34,26 @@ public class Enemy {
 	}// end update method
 	
 	private void checkCollision() {
-		if (r.intersects(Hero.rect)){
 			System.out.println("collision");
-		}
+			if (MainClass.heroClass.currentLife() > 0) {
+				MainClass.heroClass.updateCurrentLife(MainClass.heroClass.currentLife() - 1);
+
+			} else if (MainClass.heroClass.currentLife() == 0) {
+				System.out.println("Player is dead");
+				// Play a sound.
+				try{
+					AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/death.wav"));
+		            Clip music = AudioSystem.getClip();
+		            music.open(audio);
+		            music.start();
+		            MainClass.gameOver = true;
+				}
+				catch(Exception alpha)
+				{
+					System.out.println("Fatality could not be loaded");
+				}
+				MainClass.heroClass.updateCurrentLife(MainClass.heroClass.currentLife() - 1);
+			}
 	}
 
 	public void die() {

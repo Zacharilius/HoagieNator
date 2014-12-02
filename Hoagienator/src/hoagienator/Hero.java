@@ -174,4 +174,5 @@ public class Hero {
 	public ArrayList<Projectile> getProjectiles() {
 		return projectiles;
 	}
+	
 }

@@ -26,6 +26,9 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		Running, Dead
 	}
 
+	// test enemy
+	protected Heliboy testHeliboy;
+	
 	// Array to hold all hero images.
 	protected BufferedImage[] hero = new BufferedImage[16];
 
@@ -51,7 +54,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 	// Self-explanatory.
 	// protected KeyListener alpha;
-	protected Hero heroClass = new Hero();
+	protected static Hero heroClass = new Hero();
 
 	protected ItemDrops ItemClass = new ItemDrops();
 	// protected Image image;
@@ -79,11 +82,11 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	protected int changeFall = 0;
 		
 	// Used to see when the game is over.
-	protected boolean gameOver = false;
+	protected static boolean gameOver = false;
 		
 	GameState state = GameState.Running;
 
-	private Image image, projectile_fork, background;
+	private Image image, projectile_fork, background, testEnemy;
 	private Graphics second;
 	private URL base;
 
@@ -116,7 +119,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 		// Image Setups
 		projectile_fork = getImage(base, "data/bullet_fork2.png");
-
+		
 		background = getImage(base, "data/background.png");
 
 		tiledirt = getImage(base, "data/tiledirt.png");
@@ -124,6 +127,9 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		tilegrassBot = getImage(base, "data/tilegrassbot.png");
 		tilegrassLeft = getImage(base, "data/tilegrassleft.png");
 		tilegrassRight = getImage(base, "data/tilegrassright.png");
+		
+		//test enemy
+		testEnemy = getImage(base, "data/heliboy.png");
 
 		// Try to load Hero sprites, guns, and hearts.
 		try {
@@ -189,6 +195,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	public void start() {
 		bg1 = new Background(0, 0);
 		bg2 = new Background(1280, 0);
+		testHeliboy = new Heliboy(340, 360);
 		try {
 			loadMap("data/map1.txt");
 		} catch (IOException e) {
@@ -238,6 +245,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		while (true) {
 			if(gameOver == true)
 			{
+				
 				try
 				{
 				// Check to see if player has lost a heart.
@@ -263,6 +271,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				repaint();
 				break;
 			}
+			testHeliboy.update();
 			// Check to see if hero is jumping
 			if(jumpSpeed > 0)
 			{
@@ -376,6 +385,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 					currentDropY[i] = -1;
 				}
 			}
+			// 
 			// Check to see if any enemy died to spawn items.
 			if (ItemClass.isDead() == true) {
 				// Get a number from ItemDrops.
@@ -563,6 +573,11 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			}
 			g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
 			g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
+
+			//paint test enemy
+			g.drawImage(testEnemy, testHeliboy.getCenterX() - 48, testHeliboy.getCenterY() - 48, this);
+			g.drawRect((int)testHeliboy.r.getX(), (int)testHeliboy.r.getY(), (int)testHeliboy.r.getWidth(), (int)testHeliboy.r.getHeight());
+			
 			paintTiles(g);
 			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
 			// ArrayList projectiles = SHOOTER.getProjectiles();
@@ -798,14 +813,6 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				}
 				heroClass.updateCurrentLife(heroClass.currentLife() - 1);
 			}
-			break;
-
-		// TEMPORARY - This increases the hero's total health.
-		case KeyEvent.VK_ALT:
-			if (heroClass.totalLife() < heroClass.maxLives() - 1) {
-				heroClass.updateTotalLife(heroClass.totalLife() + 1);
-			}
-			break;
 		}
 	}
 
