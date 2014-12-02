@@ -42,11 +42,28 @@ public class ItemDrops {
 	public int randomDrop()
 	{
 		// Randomly get a number between 0-10.
-		Random random = new Random();
-		int number = random.nextInt(10);
-		
-		// Return that number (0-7 - no drop, 8 - health, 9 - ammo, 10 - points/money).
-		return number;
+				Random random = new Random();
+				int number = random.nextInt(10);
+				if(number == 9)
+				{
+					number = random.nextInt(10);
+					if(number == 9)
+					{
+						// Go for the big score! (999)
+						number = random.nextInt(10);
+						if(number == 9)
+						{
+							
+							return 20;
+						}
+					}
+					return number + 10;
+				}
+				else
+				{
+					// Return that number (0-6 - no drop, 7 - health, 8 - ammo (removed)).
+					return number;
+				}
 	}
 // Random number generator used to determine which item is dropped.
 }

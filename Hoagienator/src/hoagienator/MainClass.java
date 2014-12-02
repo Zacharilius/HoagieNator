@@ -35,7 +35,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	// Array to hold ammunition types?
 
 	// Array to hold all drops.
-	protected BufferedImage[] drops = new BufferedImage[1];
+	protected BufferedImage[] drops = new BufferedImage[5];
 
 	// Arrays to hold all current drops which should be currently shown on
 	// screen.
@@ -43,6 +43,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	protected int[] currentDropX = new int[9];
 	protected int[] currentDropY = new int[9];
 	protected int[] currentDropTimer = new int[9];
+	protected int[] interior = new int[9];
 
 	// Array to hold keys pressed so key combinations can be made (Ex - Shift +
 	// Move = Run)
@@ -59,7 +60,27 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	// Array with the different life hearts.
 	protected BufferedImage[] lifeHearts = new BufferedImage[heroClass
 			.maxLives()];
-
+	// Current score. 
+	protected int score = 0;
+		
+	// Landing X coordinate (If one wanted the character to land at the bottom of the screen, one would put around 350).
+	protected int ground = 355;
+	
+	// Jump speed.
+	protected int jumpSpeed = 0;
+		
+	// Fall speed.
+	protected int fallSpeed = 1;
+		
+	// Used to determine if the jumpSpeed should be altered.
+	protected int changeJump = 0;
+		
+	// Used to determine if the fallSpeed should be altered.
+	protected int changeFall = 0;
+		
+	// Used to see when the game is over.
+	protected boolean gameOver = false;
+		
 	GameState state = GameState.Running;
 
 	private Image image, projectile_fork, background;
@@ -124,18 +145,46 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			}
 
 			// Load drop images.
-			i = 0;
-			while (i < 1) {
-				drops[i] = ImageIO.read(new File("data/dropheart.png"));
-				i++;
-			}
+			drops[0] = ImageIO.read(new File("data/dropheart.png"));
+			drops[1] = ImageIO.read(new File("data/salami.png"));
+			drops[2] = ImageIO.read(new File("data/ham.png"));
+			drops[3] = ImageIO.read(new File("data/bacon.png"));
+			drops[4] = ImageIO.read(new File("data/bigheart.png"));
 		} catch (Exception imageNotFound) {
 			System.out.println("Images could not be loaded. Closing game.");
 			System.exit(0);
 		}
 
 	}
-
+	public void updateDrop(int itemNumber)
+	{
+		int i = 0;
+		while(currentDropImages[i] != null)
+		{
+			// The current slot is full, increment i.
+			i++;
+		}
+		if(i == 8)
+		{
+			// If i is 8, it is beyond the arrays size. Reduce i to the slot with the lowest timer.
+			int timer = 999;
+			for(int j = 0; j < 8; j++)
+			{
+				if(currentDropTimer[j] < timer)
+				{
+					timer = currentDropTimer[j];
+					i = j;
+				}
+			}
+		}
+		// Propagate the arrays with the appropriate information.
+		currentDropImages[i] = drops[itemNumber];
+		currentDropX[i]= ItemClass.deadX();
+		currentDropY[i]= ItemClass.deadY();
+		interior[i] = itemNumber;
+		// Drops will disappear in 10 seconds.
+		currentDropTimer[i]= 600;
+	}
 	@Override
 	public void start() {
 		bg1 = new Background(0, 0);
@@ -172,7 +221,81 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	 */
 	@Override
 	public void run() {
+		try
+        {
+			AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/song.wav"));
+            Clip music = AudioSystem.getClip();
+            
+            music.open(audio);
+            music.loop(Clip.LOOP_CONTINUOUSLY);
+
+            music.start();
+        }
+		catch(Exception alpha)
+		{
+			
+		}
 		while (true) {
+			if(gameOver == true)
+			{
+				try
+				{
+				// Check to see if player has lost a heart.
+				if (heroClass.currentLife() < heroClass.livesPresent()) {
+					int i = 0;
+					// Fill in remaining hearts that the player has.
+					while (i <= heroClass.currentLife()) {
+						lifeHearts[i] = ImageIO.read(new File("data/heart.png"));
+						i++;
+					}
+					// Fill in empty hearts.
+					while (i <= heroClass.lastCheckedLife()) {
+						lifeHearts[i] = ImageIO.read(new File("data/heartblack.png"));
+						i++;
+					}
+					heroClass.updateLivesPresent(heroClass.currentLife());
+				}
+				}
+				catch(Exception alpha)
+				{
+					
+				}
+				repaint();
+				break;
+			}
+			// Check to see if hero is jumping
+			if(jumpSpeed > 0)
+			{
+				// Change jump speed every 8 cycles.
+				if(changeJump == 8)
+				{
+					changeJump = 0;
+					jumpSpeed--;
+				}
+				else
+				{
+					changeJump++;
+				}
+			}
+			// If character is above the ground, make the character fall to the ground.
+			else if(jumpSpeed == 0 && heroClass.heroY() < ground-1)
+			{
+				// Change fall speed every 8 cycles.
+				if(changeFall == 8)
+				{
+					fallSpeed++;
+					changeFall = 0;
+				}
+				else
+				{
+					changeFall++;
+				}
+			}
+			else
+			{
+				// Reset fallSpeed.
+				fallSpeed = 1;
+			}
 			// Removes offscreen projectiles from memory.
 			ArrayList<Projectile> heroProjectiles = heroClass.getProjectiles();
 			//REPLACE 'enemy' WITH ACTUAL ENEMY VARIABLE NAME
@@ -193,7 +316,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				heroClass
 						.updateLastCheckedLife(heroClass.lastCheckedLife() + 1);
 				lifeHearts[heroClass.lastCheckedLife()] = ImageIO
-						.read(new File("heart.png"));
+						.read(new File("data/heart.png"));
 				heroClass.updateCurrentLife(heroClass.currentLife() + 1);
 			}
 
@@ -242,37 +365,53 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 					}
 				}
 			}
-
+			// If any items went off-screen, delete them.
+			for(int i = 0; i < 8; i++)
+			{
+				if(currentDropX[i] < 0)
+				{
+					currentDropTimer[i] = 0;
+					currentDropImages[i] = null;
+					currentDropX[i] = -1;
+					currentDropY[i] = -1;
+				}
+			}
 			// Check to see if any enemy died to spawn items.
 			if (ItemClass.isDead() == true) {
 				// Get a number from ItemDrops.
 				int randomNumber = ItemClass.randomDrop();
-
 				// Place the appropriate information in the currentDrops array.
-				if (randomNumber == 8) {
-					// Put health into drops array.
-					int i = 0;
-					while (currentDropImages[i] != null) {
-						// The current slot is full, increment i.
-						i++;
-					}
-					if (i == 8) {
-						// If i is 8, it is beyond the arrays size. Reduce i to
-						// 0.
-						i = 0;
-					}
-					// Propagate the arrays with the appropriate information.
-					currentDropImages[i] = drops[0];
-					currentDropX[i] = ItemClass.deadX();
-					currentDropY[i] = ItemClass.deadY();
-					// Drops will disappear in 10 seconds.
-					currentDropTimer[i] = 600;
+				if(randomNumber == 7)
+				{
+					updateDrop(0);
 				}
-				if (randomNumber == 8) {
+				if(randomNumber == 9)
+				{
 					// Spawn ammo.
 				}
-				if (randomNumber == 8) {
+				if(randomNumber > 9 && randomNumber < 20)
+				{
 					// Spawn points/money.
+					if(randomNumber < 15)
+					{
+						// Spawn 100 pt salami.
+						updateDrop(1);
+					}
+					else if(randomNumber < 18)
+					{
+						// Spawn 300 pt ham.
+						updateDrop(2);
+					}
+					else
+					{
+						// Spawn 1000 pt bacon.
+						updateDrop(3);
+					}
+				}
+				if(randomNumber == 20)
+				{
+					// Spawn increase health.
+					updateDrop(4);
 				}
 			}
 
@@ -283,25 +422,86 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 						&& heroClass.heroX() >= currentDropX[i] - 25
 						&& heroClass.heroY() <= currentDropY[i] + 23
 						&& heroClass.heroY() >= currentDropY[i] - 96) {
-					// The hero has touched a heart!
-					// Remove that heart.
-					currentDropTimer[i] = 0;
-					currentDropImages[i] = null;
-					currentDropX[i] = -1;
-					currentDropY[i] = -1;
-					// Increase the hero's health.
-					if (heroClass.currentLife() != heroClass.lastCheckedLife()) {
-						heroClass.updateCurrentLife(heroClass.currentLife + 1);
-					}
-					// Play a sound.
-					AudioInputStream audio = AudioSystem
-							.getAudioInputStream(new File("data/powerup.wav"));
-					Clip music = AudioSystem.getClip();
+					if(interior[i] == 0)
+					{
+						// The hero has touched a heart!
+						// Remove that heart.
+						currentDropTimer[i] = 0;
+						currentDropImages[i] = null;
+						currentDropX[i] = -1;
+						currentDropY[i] = -1;
+						// Increase the hero's health.
+						if(heroClass.currentLife() != heroClass.lastCheckedLife())
+						{
+							heroClass.updateCurrentLife(heroClass.currentLife + 1);
+						}
+						// Play a sound.
+						AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/powerup.wav"));
 
-					music.open(audio);
-					music.start();
+						System.out.println("A");
+			            Clip music = AudioSystem.getClip();
+			            
+			            music.open(audio);
+			            music.start();
+					}
+					if(interior[i] == 1)
+					{
+						currentDropTimer[i] = 0;
+						currentDropImages[i] = null;
+						currentDropX[i] = -1;
+						currentDropY[i] = -1;
+						score += 100;
+					}
+					if(interior[i] == 2)
+					{
+						currentDropTimer[i] = 0;
+						currentDropImages[i] = null;
+						currentDropX[i] = -1;
+						currentDropY[i] = -1;
+						score += 300;
+					}
+					if(interior[i] == 3)
+					{
+						currentDropTimer[i] = 0;
+						currentDropImages[i] = null;
+						currentDropX[i] = -1;
+						currentDropY[i] = -1;
+						score += 1000;
+					}
+					if(interior[i] > 0 && interior[i] != 4)
+					{
+						// Play a sound.
+						AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/bite.wav"));
+			            Clip music = AudioSystem.getClip();
+			            
+			            music.open(audio);
+			            music.start();
+					}
 				}
-			}
+				else if(heroClass.heroX() <= currentDropX[i]+75 && heroClass.heroX() >= currentDropX[i] -35 && heroClass.heroY() <= currentDropY[i]+38 && heroClass.heroY() >= currentDropY[i] -106)
+				{
+					if(interior[i] == 4)
+					{
+						// Increase total life.
+						if(heroClass.totalLife() < heroClass.maxLives() - 1)
+						{
+							heroClass.updateTotalLife(heroClass.totalLife() + 1);
+						}
+						
+						// Play a sound.
+						AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/ohyea.wav"));
+			            Clip music = AudioSystem.getClip();
+			            
+			            music.open(audio);
+			            music.start();
+			            currentDropTimer[i] = 0;
+						currentDropImages[i] = null;
+						currentDropX[i] = -1;
+						currentDropY[i] = -1;
+					}
+				}
+				}
+			
 			}
 			catch(Exception everything)
 			{
@@ -343,8 +543,24 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	 * Draws the graphics to the screen.
 	 */
 	public void paint(Graphics g) {
-		if (state == GameState.Running) {
-
+		if (gameOver == false) {
+			// Modify the vertical component.
+			// Jumping.
+			if(jumpSpeed > 0)
+			{
+				heroClass.updatePictureChange(0);
+				heroClass.updateHeroY(heroClass.heroY()-jumpSpeed);
+			}
+			// Falling.
+			else if(heroClass.heroY() < ground-1)
+			{
+				heroClass.updatePictureChange(0);
+				heroClass.updateHeroY(heroClass.heroY()+fallSpeed);
+			}
+			if(heroClass.heroY() >= ground)
+			{
+				heroClass.updateHeroY(ground-1);
+			}
 			g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
 			g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
 			paintTiles(g);
@@ -357,17 +573,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				g.drawImage(projectile_fork, p.getX(), p.getY(), this);
 				// g.fillRect(p.getX(), p.getY(), 10, 5);
 			}
-		} else if (state == GameState.Dead) {
-			g.setColor(Color.BLACK);
-			g.fillRect(0, 0, 800, 480);
-			g.setColor(Color.WHITE);
-			g.drawString("Dead", 360, 240);
-
-		}
+		
 
 		// Draw hero bounding box
 		g.drawRect((int)heroClass.rect.getX(), (int)heroClass.rect.getY(), (int)heroClass.rect.getWidth(), (int)heroClass.rect.getHeight());
-		g.drawRect((int)heroClass.rect2.getX(), (int)heroClass.rect2.getY(), (int)heroClass.rect2.getWidth(), (int)heroClass.rect2.getHeight());
 		
 		// Draw hero in current location.
 		g.drawImage(hero[heroClass.heroPic()], heroClass.heroX(),
@@ -382,14 +591,8 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			j = j - 55;
 			i++;
 		}
-		// Create the guns.
-		i = 0;
-		j = 745;
-		while (i < heroClass.numberGuns() && guns[i] != null) {
-			g.drawImage(guns[i], j, 70, this);
-			j = j - 55;
-			i++;
-		}
+		// Create the current score.
+		g.drawString(Integer.toString(score), 717, 90);
 
 		// Drop all drops.
 		i = 0;
@@ -455,13 +658,62 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// Ensure that the hero cannot pass the center of the screen.
 		if (heroClass.heroX() >= 400) {
 			heroClass.updateHeroX(400);
-			
+			// If the hero is moving right, move all drops left.
+						if(heroClass.movingRight() == true)
+						{
+							for(int k = 0; k < 8; k++)
+							{
+								if(currentDropX[k] != -1 && keysPressed[2] == true)
+								{
+									currentDropX[k] = currentDropX[k] - 8; 
+								}
+								else
+								{
+									currentDropX[k] = currentDropX[k] - 4; 
+								}
+							}
+						}
 			//Added code to control background
 			if (heroClass.movingRight){
 				bg1.setBgX(bg1.getBgX() - 4);
 				bg2.setBgX(bg2.getBgX() - 4);
 			}
 		}
+		// Ensure that the hero cannot pass the left of the screen.
+				if(heroClass.heroX() <= 10)
+				{
+					heroClass.updateHeroX(10);
+				}
+				
+				// If the game is over.
+				if(gameOver == true)
+				{
+					try
+					{
+						BufferedImage im = ImageIO.read(new File("data/blood.png"));
+						g.drawImage(im, 0, 0, this);
+					}
+					catch(Exception alpha)
+					{
+						System.out.println("Game could not display blood");
+					}
+				}
+		}
+		 else {
+				g.setColor(Color.BLACK);
+				g.fillRect(0, 0, 800, 480);
+				g.setColor(Color.WHITE);
+				g.drawString("Dead", 360, 240);
+				try
+				{
+					BufferedImage im = ImageIO.read(new File("data/blood.png"));
+					g.drawImage(im, 0, 0, this);
+				}
+				catch(Exception alpha)
+				{
+					System.out.println("Game could not display blood");
+				}
+			}
 
 	}
 
@@ -473,7 +725,12 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// TODO Auto-generated method stub
 		switch (arg0.getKeyCode()) {
 		case KeyEvent.VK_UP:
-			System.out.println("Move Up");
+			// If character is on the ground.
+			if(heroClass.heroY() == ground-1)
+			{
+				// Update jumpSpeed to indicate character is jumping.
+				jumpSpeed = 5;
+			}
 			break;
 
 		case KeyEvent.VK_DOWN:
@@ -493,14 +750,18 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			break;
 
 		case KeyEvent.VK_SPACE:
-			System.out.println("Jump");
-			break;
-
-		case KeyEvent.VK_CONTROL:
 			//keypress works only if max number of projectiles aren't on screen already.
 			if(heroClass.getProjectiles().size() < maxNumberProjectilesOnScreen){
 				System.out.println("Shoot");
 				heroClass.shoot();
+			}
+			break;
+
+		case KeyEvent.VK_CONTROL:
+			//TEMPORARY
+			{
+			
+				ground = 250;
 			}
 			break;
 
@@ -523,6 +784,18 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 			} else if (heroClass.currentLife() == 0) {
 				System.out.println("Player is dead");
+				// Play a sound.
+				try{
+					AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/death.wav"));
+		            Clip music = AudioSystem.getClip();
+		            music.open(audio);
+		            music.start();
+		            gameOver = true;
+				}
+				catch(Exception alpha)
+				{
+					System.out.println("Fatality could not be loaded");
+				}
 				heroClass.updateCurrentLife(heroClass.currentLife() - 1);
 			}
 			break;

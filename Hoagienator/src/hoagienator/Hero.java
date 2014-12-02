@@ -9,8 +9,7 @@ public class Hero {
 	protected int heroY = 350;
 	
 	// Bounding boxes
-	protected Rectangle rect = new Rectangle(0, 0, 0, 0);
-	protected Rectangle rect2 = new Rectangle(0, 0, 0, 0);
+	protected static Rectangle rect = new Rectangle(0, 0, 0, 0);
 
 	// Shows which way the hero is moving.
 	protected boolean movingLeft = false;

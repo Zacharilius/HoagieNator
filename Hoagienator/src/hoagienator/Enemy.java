@@ -21,20 +21,17 @@ public class Enemy {
 		speedX = bg.getSpeedX();
 		r.setBounds(centerX-25, centerY-25, 50, 60);
 		
-		/*
-		if(r.intersects(Hero.yellowRed)){
+		
+		if(r.intersects(Hero.rect)){
 			checkCollision();
 		}
-		*/
+		
 	}// end update method
 	
 	private void checkCollision() {
-		/*
-		if (r.intersects(Hero.rect) || r.intersects(Hero.rect2) || r.intersects(Hero.rect3) || r.intersects(Hero.rect4)){
-		System.out.println("collision");
-
+		if (r.intersects(Hero.rect)){
+			System.out.println("collision");
 		}
-		*/
 	}
 
 	public void die() {
