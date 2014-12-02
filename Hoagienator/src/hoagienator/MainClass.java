@@ -56,7 +56,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	// protected KeyListener alpha;
 	protected static Hero heroClass = new Hero();
 
-	protected ItemDrops ItemClass = new ItemDrops();
+	protected static ItemDrops ItemClass = new ItemDrops();
 	// protected Image image;
 	// protected Graphics second;
 

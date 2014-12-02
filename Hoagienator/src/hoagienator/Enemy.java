@@ -3,6 +3,7 @@ package hoagienator;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -67,8 +68,13 @@ public class Enemy {
 	}
 
 	public void die() {
+		// Randomly spawn health drops.
+		MainClass.ItemClass.updateIsDead(true);
+		MainClass.ItemClass.updateDeadX(centerX);
+		MainClass.ItemClass.updateDeadY(centerY);
+		
 		//just moves enemy up and out of the way.
-		setCenterY(50);
+		setCenterY(200);
 	}// end die method
 
 	public void attack() {
