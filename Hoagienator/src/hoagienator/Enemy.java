@@ -30,7 +30,9 @@ public class Enemy {
 		r.setBounds(centerX-25, centerY-25, 50, 60);
 		
 		if(r.intersects(Hero.rect)){
-			checkCollision();
+			if(!MainClass.heroClass.getInvincibility()){
+				checkCollision();
+			}
 		}
 		
 	}// end update method
@@ -39,15 +41,12 @@ public class Enemy {
 	 * Decreases Hero's health on contact
 	 */
 	private void checkCollision() {
-			System.out.println("collision");
+			System.out.println("collision");			
 			if (MainClass.heroClass.currentLife() > 0) {
 				MainClass.heroClass.updateCurrentLife(MainClass.heroClass.currentLife() - 1);
+				MainClass.heroClass.invincibility();
 				MainClass.heroClass.updateHeroX(MainClass.heroClass.heroX - 60);
-				/*
-				timer = new Timer(5000, new ActionListener() {});
-				timer.setRepeats(false);
-				timer.start();
-				*/
+				
 
 			} else if (MainClass.heroClass.currentLife() == 0) {
 				System.out.println("Player is dead");

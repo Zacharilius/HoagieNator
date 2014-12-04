@@ -595,7 +595,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		
 		// Draw hero in current location.
 		g.drawImage(hero[heroClass.heroPic()], heroClass.heroX(),
-				heroClass.heroY(), this);
+					heroClass.heroY(), this);
 
 		// Create the overlay (hearts, ammo, types of guns);
 		// Create the life hearts.

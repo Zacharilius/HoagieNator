@@ -2,8 +2,8 @@ package hoagienator;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class Hero {
 	// Hero X and Y coordinates.
@@ -16,6 +16,7 @@ public class Hero {
 	// Limited Invincibility
 	protected boolean isInvincible = false;
 	protected Timer timer;
+	protected int invincibilityLength = 1; //seconds
 
 	// Shows which way the hero is moving.
 	protected boolean movingLeft = false;
@@ -146,7 +147,7 @@ public class Hero {
 	}
 
 	public void updateCurrentLife(int x) {
-		currentLife = x;
+			currentLife = x;
 	}
 
 	public void updateLivesPresent(int x) {
@@ -169,19 +170,21 @@ public class Hero {
 		rect.setRect(centerX + 5, centerY , 30, 105);
 	}
 
-	public void updateInvincibility ( int seconds )   {
-		timer = new Timer() ;
-	    //timer.schedule ( new ToDoTask (  ) , seconds*1000 ) ;
-	  }
+	public void invincibility ()   {
+		if(isInvincible == false){			
+			timer = new Timer(true);
+			isInvincible = true;
+		    timer.schedule ( new invincibility (), invincibilityLength*1000 ) ;
+		}		
+	}
 		
-	/*
-	  class ToDoTask extends TimerTask  {
-	    public void run (  )   {
-	      System.out.println ( "OK, It's time to do something!" ) ;
+	class invincibility extends TimerTask  {
+	    public void run ()   {
+	      isInvincible = false;
 	      timer.cancel (  ) ; //Terminate the thread
 	    }
-	  }
-	*/
+	 }
+	
 	public void updateInvisibility(boolean x){
 		isInvincible = x;
 	}
