@@ -388,6 +388,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			// 
 			// Check to see if any enemy died to spawn items.
 			if (ItemClass.isDead() == true) {
+				ItemClass.updateIsDead(false);
 				// Get a number from ItemDrops.
 				int randomNumber = ItemClass.randomDrop();
 				// Place the appropriate information in the currentDrops array.
@@ -719,6 +720,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				g.fillRect(0, 0, 800, 480);
 				g.setColor(Color.WHITE);
 				g.drawString("Dead", 360, 240);
+				g.drawString(Integer.toString(score), 360, 253);
 				try
 				{
 					BufferedImage im = ImageIO.read(new File("data/blood.png"));
