@@ -26,11 +26,18 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		Running, Dead
 	}
 
-	// test enemy
-	protected static Heliboy testHeliboy;
+	// test enemies
+	protected static Heliboy testHeliboy, testHeliboy2;
+	
+	//time for respawning enemies
+	protected boolean spawnTimerOn = false;
+	protected int spawnTimer = 0;
 	
 	// Array to hold all hero images.
 	protected BufferedImage[] hero = new BufferedImage[16];
+	
+	// Array to hold all enemy images.
+	protected BufferedImage[] enemy = new BufferedImage[5];
 
 	// Array to hold all the guns.
 	protected BufferedImage[] guns = new BufferedImage[1];
@@ -87,6 +94,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	GameState state = GameState.Running;
 
 	private Image image, projectile_fork, background, testEnemy;
+	private Image heliboy, heliboy2, heliboy3, heliboy4, heliboy5;
 	private Graphics second;
 	private URL base;
 
@@ -107,10 +115,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		setBackground(Color.BLACK);
 		setFocusable(true);
 		Frame frame = (Frame) this.getParent().getParent();
-		frame.setTitle("The Hogienator");
+		frame.setTitle("The Hoagienator");
 		addKeyListener(this);
 
-		// Define base for location of backgrounds,sprites
+		// Define base for location of backgrounds, sprites
 		try {
 			base = getDocumentBase();
 		} catch (Exception e) {
@@ -131,7 +139,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		//test enemy
 		testEnemy = getImage(base, "data/heliboy.png");
 
-		// Try to load Hero sprites, guns, and hearts.
+		// Try to load Hero sprites, guns, enemy sprites, and hearts.
 		try {
 			int i = 0;
 			while (i < 16) {
@@ -156,6 +164,13 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			drops[2] = ImageIO.read(new File("data/ham.png"));
 			drops[3] = ImageIO.read(new File("data/bacon.png"));
 			drops[4] = ImageIO.read(new File("data/bigheart.png"));
+			
+			// Load enemy sprites.
+			enemy[0] = ImageIO.read(new File("data/heliboy.png"));
+			enemy[1] = ImageIO.read(new File("data/heliboy2.png"));
+			enemy[2] = ImageIO.read(new File("data/heliboy3.png"));
+			enemy[3] = ImageIO.read(new File("data/heliboy4.png"));
+			enemy[4] = ImageIO.read(new File("data/heliboy5.png"));
 		} catch (Exception imageNotFound) {
 			System.out.println("Images could not be loaded. Closing game.");
 			System.exit(0);
@@ -195,7 +210,8 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	public void start() {
 		bg1 = new Background(0, 0);
 		bg2 = new Background(1280, 0);
-		testHeliboy = new Heliboy(340, 360);
+		testHeliboy = new Heliboy(360, 360);
+		//testHeliboy2 = new Heliboy(800, 360);
 		try {
 			loadMap("data/map1.txt");
 		} catch (IOException e) {
@@ -228,8 +244,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 	 */
 	@Override
 	public void run() {
-		try
-        {
+		try {
 			AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/song.wav"));
             Clip music = AudioSystem.getClip();
             
@@ -238,16 +253,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
             music.start();
         }
-		catch(Exception alpha)
-		{
-			
-		}
+		catch(Exception alpha){}
 		while (true) {
-			if(gameOver == true)
-			{
-				
-				try
-				{
+			if(gameOver) {
+				try {
 				// Check to see if player has lost a heart.
 				if (heroClass.currentLife() < heroClass.livesPresent()) {
 					int i = 0;
@@ -264,14 +273,26 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 					heroClass.updateLivesPresent(heroClass.currentLife());
 				}
 				}
-				catch(Exception alpha)
-				{
-					
-				}
+				catch(Exception alpha){}
 				repaint();
 				break;
 			}
 			testHeliboy.update();
+			//handle respawning enemies
+			if (spawnTimerOn){
+				if (spawnTimer < 250 && heroClass.movingRight()){
+					spawnTimer++;
+				}
+				else if (spawnTimer < 250){
+					
+				}
+				else {
+					spawnTimer = 0;
+					spawnTimerOn = false;
+					Random randy = new Random();
+					testHeliboy = new Heliboy(799, randy.nextInt(60) + 340);
+				}
+			}
 			// Check to see if hero is jumping
 			if(jumpSpeed > 0)
 			{
@@ -290,13 +311,11 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			else if(jumpSpeed == 0 && heroClass.heroY() < ground-1)
 			{
 				// Change fall speed every 8 cycles.
-				if(changeFall == 8)
-				{
+				if(changeFall == 8) {
 					fallSpeed++;
 					changeFall = 0;
 				}
-				else
-				{
+				else {
 					changeFall++;
 				}
 			}
@@ -386,8 +405,12 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				}
 			}
 			// 
-			// Check to see if any enemy died to spawn items.
+			// Check to see if any enemy died to respawn and spawn items.
 			if (ItemClass.isDead() == true) {
+				if (testHeliboy.getCenterX() > 0){
+					score += 10;
+				}
+				spawnTimerOn = true;
 				ItemClass.updateIsDead(false);
 				// Get a number from ItemDrops.
 				int randomNumber = ItemClass.randomDrop();
@@ -449,7 +472,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 						// Play a sound.
 						AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/powerup.wav"));
 
-						System.out.println("A");
+						//System.out.println("A");
 			            Clip music = AudioSystem.getClip();
 			            
 			            music.open(audio);
@@ -514,10 +537,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				}
 			
 			}
-			catch(Exception everything)
-			{
-				
-			}
+			catch(Exception everything) {}
 
 			updateTiles();
 			bg1.update();
@@ -577,11 +597,9 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 
 			//paint test enemy
 			g.drawImage(testEnemy, testHeliboy.getCenterX() - 48, testHeliboy.getCenterY() - 48, this);
-			g.drawRect((int)testHeliboy.r.getX(), (int)testHeliboy.r.getY(), (int)testHeliboy.r.getWidth(), (int)testHeliboy.r.getHeight());
+			//g.drawRect((int)testHeliboy.r.getX(), (int)testHeliboy.r.getY(), (int)testHeliboy.r.getWidth(), (int)testHeliboy.r.getHeight());
 			
 			paintTiles(g);
-			// REPLACE 'SHOOTER' WITH REAL CLASS NAME.
-			// ArrayList projectiles = SHOOTER.getProjectiles();
 			ArrayList projectiles = heroClass.getProjectiles();
 			for (int i = 0; i < projectiles.size(); i++) {
 				Projectile p = (Projectile) projectiles.get(i);
@@ -592,7 +610,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		
 
 		// Draw hero bounding box
-		g.drawRect((int)heroClass.rect.getX(), (int)heroClass.rect.getY(), (int)heroClass.rect.getWidth(), (int)heroClass.rect.getHeight());
+		//g.drawRect((int)heroClass.rect.getX(), (int)heroClass.rect.getY(), (int)heroClass.rect.getWidth(), (int)heroClass.rect.getHeight());
 		
 		// Draw hero in current location.
 		g.drawImage(hero[heroClass.heroPic()], heroClass.heroX(),
@@ -674,9 +692,10 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// Ensure that the hero cannot pass the center of the screen.
 		if (heroClass.heroX() >= 400) {
 			heroClass.updateHeroX(400);
-			// If the hero is moving right, move all drops left.
+			// If the hero is moving right, move all drops and enemies left.
 						if(heroClass.movingRight() == true)
 						{
+							testHeliboy.setCenterX(testHeliboy.getCenterX() - 2);
 							for(int k = 0; k < 8; k++)
 							{
 								if(currentDropX[k] != -1 && keysPressed[2] == true)
@@ -696,21 +715,17 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			}
 		}
 		// Ensure that the hero cannot pass the left of the screen.
-				if(heroClass.heroX() <= 10)
-				{
+				if(heroClass.heroX() <= 10) {
 					heroClass.updateHeroX(10);
 				}
 				
 				// If the game is over.
-				if(gameOver == true)
-				{
-					try
-					{
+				if(gameOver == true) {
+					try {
 						BufferedImage im = ImageIO.read(new File("data/blood.png"));
 						g.drawImage(im, 0, 0, this);
 					}
-					catch(Exception alpha)
-					{
+					catch(Exception alpha) {
 						System.out.println("Game could not display blood");
 					}
 				}
@@ -743,25 +758,24 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		switch (arg0.getKeyCode()) {
 		case KeyEvent.VK_UP:
 			// If character is on the ground.
-			if(heroClass.heroY() == ground-1)
-			{
+			if(heroClass.heroY() == ground-1) {
 				// Update jumpSpeed to indicate character is jumping.
 				jumpSpeed = 5;
 			}
 			break;
 
 		case KeyEvent.VK_DOWN:
-			System.out.println("Move Down");
+			//System.out.println("Move Down");
 			break;
 
 		case KeyEvent.VK_LEFT:
-			System.out.println("Move Left");
+			//System.out.println("Move Left");
 			heroClass.updateMovingLeft(true);
 			keysPressed[0] = true;
 			break;
 
 		case KeyEvent.VK_RIGHT:
-			System.out.println("Move Right");
+			//System.out.println("Move Right");
 			heroClass.updateMovingRight(true);
 			keysPressed[1] = true;
 			break;
@@ -769,7 +783,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		case KeyEvent.VK_SPACE:
 			//keypress works only if max number of projectiles aren't on screen already.
 			if(heroClass.getProjectiles().size() < maxNumberProjectilesOnScreen){
-				System.out.println("Shoot");
+				//System.out.println("Shoot");
 				heroClass.shoot();
 			}
 			break;
@@ -777,7 +791,6 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		case KeyEvent.VK_CONTROL:
 			//TEMPORARY
 			{
-			
 				ground = 250;
 			}
 			break;
@@ -800,7 +813,7 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				heroClass.updateCurrentLife(heroClass.currentLife() - 1);
 
 			} else if (heroClass.currentLife() == 0) {
-				System.out.println("Player is dead");
+				//System.out.println("Player is dead");
 				// Play a sound.
 				try{
 					AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/death.wav"));
@@ -809,14 +822,13 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		            music.start();
 		            gameOver = true;
 				}
-				catch(Exception alpha)
-				{
+				catch(Exception alpha) {
 					System.out.println("Fatality could not be loaded");
 				}
 				heroClass.updateCurrentLife(heroClass.currentLife() - 1);
 			}
 		}
-	}
+	}//end keyPressed method
 
 	/**
 	 * Carries out responses to Key Releases.
@@ -826,27 +838,27 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		// TODO Auto-generated method stub
 		switch (arg0.getKeyCode()) {
 		case KeyEvent.VK_UP:
-			System.out.println("Stop Moving Up");
+			//System.out.println("Stop Moving Up");
 			break;
 
 		case KeyEvent.VK_DOWN:
-			System.out.println("Stop Moving Down");
+			//System.out.println("Stop Moving Down");
 			break;
 
 		case KeyEvent.VK_LEFT:
-			System.out.println("Stop Moving Left");
+			//System.out.println("Stop Moving Left");
 			heroClass.updateMovingLeft(false);
 			keysPressed[0] = false;
 			break;
 
 		case KeyEvent.VK_RIGHT:
-			System.out.println("Stop Moving Right");
+			//System.out.println("Stop Moving Right");
 			heroClass.updateMovingRight(false);
 			keysPressed[1] = false;
 			break;
 
 		case KeyEvent.VK_SPACE:
-			System.out.println("Stop Jump");
+			//System.out.println("Stop Jump");
 			break;
 
 		case KeyEvent.VK_SHIFT:
@@ -855,14 +867,14 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 			ItemClass.updateDeadX(0);
 			ItemClass.updateDeadY(0);
 		}
-	}
+	}//end keyReleased method
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
-	}
+	}//end keyTyped method
 
-	
+	//Loads the level data from file
 	private void loadMap(String filename) throws IOException {
 		ArrayList lines = new ArrayList();
 		int width = 0;
@@ -876,11 +888,9 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 				reader.close();
 				break;
 			}
-
 			if (!line.startsWith("!")) {
 				lines.add(line);
 				width = Math.max(width, line.length());
-
 			}
 		}
 		height = lines.size();
@@ -888,39 +898,38 @@ public class MainClass extends Applet implements Runnable, KeyListener {
 		for (int j = 0; j < 12; j++) {
 			String line = (String) lines.get(j);
 			for (int i = 0; i < width; i++) {
-
 				if (i < line.length()) {
 					char ch = line.charAt(i);
 					Tile t = new Tile(i, j, Character.getNumericValue(ch));
 					tilearray.add(t);
 				}
-
 			}
 		}
 
-	}
+	}//end loadMap method
 
+	//Updates the tile array
 	private void updateTiles() {
-
 		for (int i = 0; i < tilearray.size(); i++) {
 			Tile t = (Tile) tilearray.get(i);
 			t.update();
 		}
+	}//end updateTiles method
 
-	}
-
+	//Paints the level tiles to the screen
 	private void paintTiles(Graphics g) {
 		for (int i = 0; i < tilearray.size(); i++) {
 			Tile t = (Tile) tilearray.get(i);
 			g.drawImage(t.getTileImage(), t.getTileX(), t.getTileY(), this);
 		}
-	}
+	}//end paintTiles method
 
 	public static Background getBg1() {
 		return bg1;
-	}
+	}//end getBg1 method
 
 	public static Background getBg2() {
 		return bg2;
-	}
-}
+	}//end getBg2 method
+	
+}//end MainClass

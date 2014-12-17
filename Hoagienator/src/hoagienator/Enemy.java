@@ -25,6 +25,9 @@ public class Enemy {
 	protected ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 
 	public void update() {
+		if (centerX < 0){
+			die();
+		}
 		centerX += speedX;
 		speedX = bg.getSpeedX();
 		r.setBounds(centerX-25, centerY-25, 50, 60);
@@ -41,7 +44,7 @@ public class Enemy {
 	 * Decreases Hero's health on contact
 	 */
 	private void checkCollision() {
-			System.out.println("collision");			
+			//System.out.println("collision");			
 			if (MainClass.heroClass.currentLife() > 0) {
 				MainClass.heroClass.updateCurrentLife(MainClass.heroClass.currentLife() - 1);
 				MainClass.heroClass.invincibility();
@@ -49,7 +52,7 @@ public class Enemy {
 				
 
 			} else if (MainClass.heroClass.currentLife() == 0) {
-				System.out.println("Player is dead");
+				//System.out.println("Player is dead");
 				// Play a sound.
 				try{
 					AudioInputStream audio = AudioSystem.getAudioInputStream(new File("data/death.wav"));
@@ -73,7 +76,7 @@ public class Enemy {
 		MainClass.ItemClass.updateDeadY(centerY);
 		
 		//just moves enemy up and out of the way.
-		setCenterY(200);
+		setCenterY(900);
 	}// end die method
 
 	public void attack() {
